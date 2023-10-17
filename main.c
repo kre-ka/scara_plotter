@@ -10,6 +10,10 @@ int main(){
     Manipulator manipulator;
     manipulator.l_0 = 100.0;
     manipulator.l_1 = 50.0;
+    manipulator.theta_0_range[0] = -M_PI_2;
+    manipulator.theta_0_range[1] = M_PI_2;
+    manipulator.theta_1_range[0] = -M_PI_2;
+    manipulator.theta_1_range[1] = M_PI_2;
 
     float in[] = {100.0, 50.0};
     float out[2];
