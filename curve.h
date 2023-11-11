@@ -20,4 +20,6 @@ void cubic_curve_init_bezier(CubicCurve *curve, float points[4][2]);
 
 void cubic_curve_diff(QuadraticCurve *out, CubicCurve *in);
 
+float p_integrand_fun(float t, int poly_deg, float curve_diff_coef[2][poly_deg+1]);
+
 #endif /* INC_CURVE_H_ */

@@ -1,4 +1,6 @@
 #include "curve.h"
+#include "polynomial.h"
+#include <math.h>
 
 void cubic_curve_init_bezier(CubicCurve *curve, float points[4][2]){
     for(int i=0; i < 2; i++){
@@ -22,4 +24,12 @@ void cubic_curve_diff(QuadraticCurve *out, CubicCurve *in){
         out->t_span[i] = in->t_span[i];
     }
     out->deg = 2;
+}
+
+float p_integrand_fun(float t, int poly_deg, float curve_diff_coef[2][poly_deg+1]){
+    float curve_diff_eval[2];
+    curve_diff_eval[0] = poly_eval_f(t, curve_diff_coef[0], poly_deg);
+    curve_diff_eval[1] = poly_eval_f(t, curve_diff_coef[1], poly_deg);
+
+    return sqrtf(powf(curve_diff_eval[0], 2) + powf(curve_diff_eval[1], 2));
 }
