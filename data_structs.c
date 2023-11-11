@@ -3,6 +3,7 @@
 
 TreeNode* tree_create_node(float data){
     TreeNode *node = malloc(sizeof(TreeNode));
+    if (!node) exit(EXIT_FAILURE);
     node->data = data;
     node->left = NULL;
     node->right = NULL;
