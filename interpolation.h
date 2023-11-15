@@ -5,12 +5,12 @@
 
 typedef struct {
 	float x_0;
+	float t_0;
 	float step;
-	int t_n;
 } Lerp;
 
-void lerp_init(Lerp *lerp, float x_0, float x_n, int t_n);
-float lerp(Lerp *lerp, int t);
+void lerp_init(Lerp *lerp, float x_0, float x_n, float t_0, float t_n);
+float lerp(Lerp *lerp, float t);
 
 
 struct _find_interpolation_points_extra_params{

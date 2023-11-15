@@ -3,14 +3,14 @@
 #include <stdlib.h>
 
 
-void lerp_init(Lerp *lerp, float x_0, float x_n, int t_n){
+void lerp_init(Lerp *lerp, float x_0, float x_n, float t_0, float t_n){
     lerp->x_0 = x_0;
-    lerp->step = (float) (x_n - x_0) / t_n;
-    lerp->t_n = t_n;
+    lerp->step = (x_n - x_0) / (t_n - t_0);
+    lerp->t_0 = t_0;
 }
 
-float lerp(Lerp *lerp, int t){
-    return lerp->x_0 + t * lerp->step;
+float lerp(Lerp *lerp, float t){
+    return lerp->x_0 + (t - lerp->t_0) * lerp->step;
 }
 
 void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_param_num, float (*f)(float, int, float [2][f_param_num]), float f_params[2][f_param_num], float t_span[2], float abs_err_max, float rel_error_max){
