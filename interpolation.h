@@ -10,7 +10,7 @@ typedef struct {
 } Lerp;
 
 void lerp_init(Lerp *lerp, float x_0, float x_n, int t_n);
-float lerp_interpolate(Lerp *lerp, int t);
+float lerp(Lerp *lerp, int t);
 
 
 struct _find_interpolation_points_extra_params{
