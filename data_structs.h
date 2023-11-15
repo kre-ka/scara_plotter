@@ -1,12 +1,12 @@
 #ifndef INC_DATA_STRUCTS_H_
 #define INC_DATA_STRUCTS_H_
 
-struct tree_node {
+typedef struct TreeNode TreeNode;
+struct TreeNode {
     float data;
-    struct tree_node* left;
-    struct tree_node* right;
+    struct TreeNode* left;
+    struct TreeNode* right;
 };
-typedef struct tree_node TreeNode;
 
 TreeNode* tree_create_node(float data);
 TreeNode* tree_add_node_left(TreeNode *root, float data);

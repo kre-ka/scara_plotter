@@ -3,13 +3,12 @@
 
 #include <stdbool.h>
 
-struct manipulator {
+typedef struct {
 	float l_0;
 	float l_1;
 	float theta_0_range[2];
 	float theta_1_range[2];
-};
-typedef struct manipulator Manipulator;
+} Manipulator;
 
 bool is_in_range_angle(Manipulator *manipulator, float *theta);
 int inverse_kinematics(Manipulator *manipulator , float *in, float *out, int mode);

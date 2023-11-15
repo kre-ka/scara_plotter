@@ -3,12 +3,11 @@
 
 #include "data_structs.h"
 
-struct lerp {
+typedef struct {
 	float x_0;
 	float step;
 	int t_n;
-};
-typedef struct lerp Lerp;
+} Lerp;
 
 void lerp_init(Lerp *lerp, float x_0, float x_n, int t_n);
 float lerp_interpolate(Lerp *lerp, int t);

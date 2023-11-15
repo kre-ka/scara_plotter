@@ -1,19 +1,17 @@
 #ifndef INC_CURVE_H_
 #define INC_CURVE_H_
 
-struct cubic_curve {
+typedef struct {
 	float coef[2][4];
 	float t_span[2];
 	float deg;
-};
-typedef struct cubic_curve CubicCurve;
+} CubicCurve;
 
-struct quadratic_curve {
+typedef struct {
 	float coef[2][3];
 	float t_span[2];
 	float deg;
-};
-typedef struct quadratic_curve QuadraticCurve;
+} QuadraticCurve;
 
 
 void cubic_curve_init_bezier(CubicCurve *curve, float points[4][2]);
