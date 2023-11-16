@@ -23,4 +23,9 @@ void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_
 
 void _find_interpolation_points_linear(int f_param_num, float (*f)(float, int, float [2][f_param_num]), float f_params[2][f_param_num], struct _find_interpolation_points_extra_params *extra_params, float t_tab[2], float f_tab[2], TreeNode *t_out_root);
 
+/*
+Maps t_in to x_out using linear interpolation between t_map to x_map lookup table points
+*/
+void lerp_map(float *x_out, float *t_in, int t_in_size, float *t_map, float *x_map, int map_size);
+
 #endif /* INC_INTERPOLATION_H_ */
