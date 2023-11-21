@@ -9,14 +9,29 @@
 #define ACC_MAX 1000.0
 
 typedef struct {
+	float x_min, r_min_sqr, r_max_straight_sqr, r_max_edge_sqr, y_border, x_center_edge, y_center_edge;
+} ManipulatorWorkAreaData;
+
+typedef struct {
 	float l_0;
 	float l_1;
-	float theta_0_range[2];
-	float theta_1_range[2];
+	float theta_0_min;
+	float theta_0_max;
+	float theta_1_min;
+	float theta_1_max;
+	int configuration;
+	ManipulatorWorkAreaData work_area_data;
 } Manipulator;
 
-bool is_in_range_angle(Manipulator *manipulator, float *theta);
-int inverse_kinematics(Manipulator *manipulator , float *in, float *out, int mode);
+bool manipulator_init(Manipulator *manipulator, float l_0, float l_1, float theta_0_min, float theta_0_max, float theta_1_min, float theta_1_max);
+
+bool _check_manipulator_assumptions(float l_0, float l_1, float theta_0_min, float theta_0_max, float theta_1_min, float theta_1_max);
+
+bool is_in_range_angle(Manipulator *manipulator, float theta[2]);
+
+bool is_in_range_work_area(Manipulator *manipulator, float point[2]);
+
+int inverse_kinematics(Manipulator *manipulator , float *in, float *out, int configuration);
 
 /*
 Calculates movement phase change moments for a single curve, that is when to:
