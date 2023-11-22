@@ -29,20 +29,35 @@ bool manipulator_init(Manipulator *manipulator, float l_0, float l_1, float thet
 	manipulator->theta_1_max = theta_1_max;
 	
 	// work area data
-	float x_min = l_0*cosf(theta_0_min) + l_1*cosf(theta_0_min + theta_1_max);
+	// these are helper variables to avoid duplicating code for both configurations
+	float theta_0_abs_min, theta_0_abs_max, theta_1_abs_min, theta_1_abs_max;
+	if (manipulator->configuration == RIGHT) {
+		theta_0_abs_min = theta_0_max;
+		theta_0_abs_max = theta_0_min;
+		theta_1_abs_min = theta_1_min;
+		theta_1_abs_max = theta_1_max;
+	}
+	else {
+		theta_0_abs_min = theta_0_min;
+		theta_0_abs_max = theta_0_max;
+		theta_1_abs_min = theta_1_max;
+		theta_1_abs_max = theta_1_min;
+	}
+	// minimal x value (<=0)
+	float x_min = l_0*cosf(theta_0_abs_max) + l_1*cosf(theta_0_abs_max + theta_1_abs_max);
 	if (x_min < 0.0) x_min = 0.0;
 	manipulator->work_area_data.x_min = x_min;
-	// minimal range radius (center at (0,0))
-	manipulator->work_area_data.r_min_sqr = powf(l_0, 2) + powf(l_1, 2) - 2*l_0*l_1*cosf(M_PI-theta_1_max);
-	// maximal range radius for theta_1=0 (manipulator fully straight; center at (0,0))
-	manipulator->work_area_data.r_max_straight_sqr = powf(l_0 + l_1*cosf(theta_1_min), 2);
-	// maximal range for theta_0=max (moving theta_1 when theta_0 is at maximum position; center at (x_center_edge, y_center_edge))
+	// minimal range radius squared (center at (0,0))
+	manipulator->work_area_data.r_min_sqr = powf(l_0, 2) + powf(l_1, 2) - 2*l_0*l_1*cosf(M_PI-theta_1_abs_max);
+	// maximal range radius squared for theta_1=0 (manipulator fully straight; center at (0,0))
+	manipulator->work_area_data.r_max_straight_sqr = powf(l_0 + l_1*cosf(theta_1_abs_min), 2);
+	// maximal range radius squared for theta_0=max (moving theta_1 when theta_0 is at maximum position; center at (x_center_edge, y_center_edge))
 	manipulator->work_area_data.r_max_edge_sqr = powf(l_1, 2);
 	// center of maximal range circle for theta_0=max
-	manipulator->work_area_data.x_center_edge = l_0*cosf(theta_0_max);
-	manipulator->work_area_data.y_center_edge = l_0*sinf(theta_0_max);
+	manipulator->work_area_data.x_center_edge = l_0*cosf(theta_0_abs_min);
+	manipulator->work_area_data.y_center_edge = l_0*sinf(theta_0_abs_min);
 	// border between r_max_straight and r_max_edge appliance area (based on last point where manipulator can be fully straight)
-	manipulator->work_area_data.y_border = (l_0 + l_1)*sinf(theta_0_max);
+	manipulator->work_area_data.y_border = (l_0 + l_1)*sinf(theta_0_abs_min);
 
 	return true;
 }
@@ -58,12 +73,12 @@ bool is_in_range_work_area(Manipulator *manipulator, float point[2]){
 	float r_sqr = powf(point[0], 2) + powf(point[1], 2);
 	// r_sqr >= r_min_sqr
 	if (r_sqr < manipulator->work_area_data.r_min_sqr) return false;
-	// y <= y_border
-	if (point[1] <= manipulator->work_area_data.y_border) {
+	// (y <= y_border) XOR (config == RIGHT)
+	// looks scary, but otherwise i would have to duplicate code
+	if ((point[1] <= manipulator->work_area_data.y_border) != (manipulator->configuration == RIGHT)) {
 		// r_sqr <= r_max_straight_sqr
 		if (r_sqr > manipulator->work_area_data.r_max_straight_sqr) return false;
 	}
-	// y > y_border
 	else {
 		// r_sqr <= r_max_edge_sqr
 		if (powf(point[0] - manipulator->work_area_data.x_center_edge, 2) + 
@@ -73,11 +88,11 @@ bool is_in_range_work_area(Manipulator *manipulator, float point[2]){
 	return true;
 }
 
-int inverse_kinematics(Manipulator *manipulator, float *in, float *out, ManipulatorConfig configuration){
+int inverse_kinematics(Manipulator *manipulator, float *in, float *out){
 	float r = sqrtf(powf(in[0], 2) + powf(in[1], 2));
-	out[0] = atan2f(in[1], in[0]) - configuration * acosf((powf(manipulator->l_0, 2) - powf(manipulator->l_1, 2) + powf(r, 2)) /
+	out[0] = atan2f(in[1], in[0]) - manipulator->configuration * acosf((powf(manipulator->l_0, 2) - powf(manipulator->l_1, 2) + powf(r, 2)) /
 			(2 * manipulator->l_0 * r));
-	out[1] = configuration * acosf((powf(r, 2) - powf(manipulator->l_0, 2) - powf(manipulator->l_1, 2)) /
+	out[1] = manipulator->configuration * acosf((powf(r, 2) - powf(manipulator->l_0, 2) - powf(manipulator->l_1, 2)) /
 			(2 * manipulator->l_0 * manipulator->l_1));
 	return 0;
 }
