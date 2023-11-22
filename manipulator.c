@@ -4,6 +4,23 @@
 #include <math.h>
 
 bool manipulator_init(Manipulator *manipulator, float l_0, float l_1, float theta_0_min, float theta_0_max, float theta_1_min, float theta_1_max){
+	// validate input
+	bool result = true;
+	if (l_0 <= 0 || l_1 <= 0){
+		result = false;
+		printf("l_0 and l_1 must be greater than 0.\n");
+	}
+	if (theta_0_max < theta_0_min || theta_1_max < theta_1_min){
+		result = false;
+		printf("Maximal theta values must be greater than minial values.\n");
+	}
+	if (!result) return false;
+
+	// set manipulator configuration based on theta_1 range
+	// it will only work in one configuration (for simplicity)
+	if (fabsf(theta_1_max) >= fabsf(theta_1_min)) manipulator->configuration = RIGHT;
+	else manipulator->configuration = LEFT;
+	
 	manipulator->l_0 = l_0;
 	manipulator->l_1 = l_1;
 	manipulator->theta_0_min = theta_0_min;
@@ -11,14 +28,6 @@ bool manipulator_init(Manipulator *manipulator, float l_0, float l_1, float thet
 	manipulator->theta_1_min = theta_1_min;
 	manipulator->theta_1_max = theta_1_max;
 	
-	// left/right (-1/1) configuration for inverse kinematics
-	manipulator->configuration = RIGHT;
-	
-	// this is not as universal as you may wish, rather suited for a specific robot configuration, so there are some assumptions
-	if (!_check_manipulator_assumptions(l_0, l_1, theta_0_min, theta_0_max, theta_1_min, theta_1_max)){
-		printf("Robot assumptions not met. Aborting");
-		return false;
-	}
 	// work area data
 	float x_min = l_0*cosf(theta_0_min) + l_1*cosf(theta_0_min + theta_1_max);
 	if (x_min < 0.0) x_min = 0.0;
@@ -36,23 +45,6 @@ bool manipulator_init(Manipulator *manipulator, float l_0, float l_1, float thet
 	manipulator->work_area_data.y_border = (l_0 + l_1)*sinf(theta_0_max);
 
 	return true;
-}
-
-bool _check_manipulator_assumptions(float l_0, float l_1, float theta_0_min, float theta_0_max, float theta_1_min, float theta_1_max) {
-	bool result = true;
-	if (l_0 <= 0 || l_1 <= 0){
-		result = false;
-		printf("l_0 and l_1 must be greater than 0.\n");
-	}
-	if (theta_0_max < theta_0_min || theta_1_max < theta_1_min){
-		result = false;
-		printf("Maximal theta values must be greater than minial values.\n");
-	}
-	if (theta_1_min < 0.0){
-		result = false;
-		printf("Minimal theta_1 value must be greater or equal 0 (so robot works in only one configuration (right)).");
-	}
-	return result;
 }
 
 bool is_in_range_angle(Manipulator *manipulator, float theta[2]){
