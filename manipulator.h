@@ -12,6 +12,11 @@ typedef struct {
 	float x_min, r_min_sqr, r_max_straight_sqr, r_max_edge_sqr, y_border, x_center_edge, y_center_edge;
 } ManipulatorWorkAreaData;
 
+typedef enum {
+	LEFT = -1,
+	RIGHT = 1	
+} ManipulatorConfig;
+
 typedef struct {
 	float l_0;
 	float l_1;
@@ -19,7 +24,7 @@ typedef struct {
 	float theta_0_max;
 	float theta_1_min;
 	float theta_1_max;
-	int configuration;
+	ManipulatorConfig configuration;
 	ManipulatorWorkAreaData work_area_data;
 } Manipulator;
 
@@ -31,7 +36,7 @@ bool is_in_range_angle(Manipulator *manipulator, float theta[2]);
 
 bool is_in_range_work_area(Manipulator *manipulator, float point[2]);
 
-int inverse_kinematics(Manipulator *manipulator , float *in, float *out, int configuration);
+int inverse_kinematics(Manipulator *manipulator , float *in, float *out, ManipulatorConfig configuration);
 
 /*
 Calculates movement phase change moments for a single curve, that is when to:

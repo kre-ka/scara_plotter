@@ -12,7 +12,7 @@ bool manipulator_init(Manipulator *manipulator, float l_0, float l_1, float thet
 	manipulator->theta_1_max = theta_1_max;
 	
 	// left/right (-1/1) configuration for inverse kinematics
-	manipulator->configuration = 1;
+	manipulator->configuration = RIGHT;
 	
 	// this is not as universal as you may wish, rather suited for a specific robot configuration, so there are some assumptions
 	if (!_check_manipulator_assumptions(l_0, l_1, theta_0_min, theta_0_max, theta_1_min, theta_1_max)){
@@ -81,7 +81,7 @@ bool is_in_range_work_area(Manipulator *manipulator, float point[2]){
 	return true;
 }
 
-int inverse_kinematics(Manipulator *manipulator, float *in, float *out, int configuration){
+int inverse_kinematics(Manipulator *manipulator, float *in, float *out, ManipulatorConfig configuration){
 	float r = sqrtf(powf(in[0], 2) + powf(in[1], 2));
 	out[0] = atan2f(in[1], in[0]) - configuration * acosf((powf(manipulator->l_0, 2) - powf(manipulator->l_1, 2) + powf(r, 2)) /
 			(2 * manipulator->l_0 * r));
