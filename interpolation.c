@@ -86,13 +86,13 @@ void _find_interpolation_points_linear(int f_param_num, float (*f)(float, int, f
 
 void lerp_map(float *x_out, float *t_in, int t_in_size, float *t_map, float *x_map, int map_size){
     int idx_map = 0;
-    Lerp p_t_lerp;
-    lerp_init(&p_t_lerp, x_map[0], x_map[1], t_map[0], t_map[1]);
+    Lerp lerp_data;
+    lerp_init(&lerp_data, x_map[0], x_map[1], t_map[0], t_map[1]);
     for (int i=0; i < t_in_size; i++) {
         while (t_in[i] > t_map[idx_map+1]){
             idx_map++;
-            lerp_init(&p_t_lerp, x_map[idx_map], x_map[idx_map+1], t_map[idx_map], t_map[idx_map+1]);
+            lerp_init(&lerp_data, x_map[idx_map], x_map[idx_map+1], t_map[idx_map], t_map[idx_map+1]);
         }
-        x_out[i] = lerp(&p_t_lerp, t_in[i]);
+        x_out[i] = lerp(&lerp_data, t_in[i]);
     }
 }
