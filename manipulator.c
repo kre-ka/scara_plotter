@@ -146,7 +146,7 @@ void calc_p_trajectory(float *p_tab_out, float t_phases[3], float t_res, float p
 	}
 	// in case of not reaching target speed
 	// float v = ACC_MAX * t_res * idx_phases[0];
-	float v = ACC_MAX * t_phases[1];
+	float v = ACC_MAX * t_phases[0];
 	// constant speed
 	for(int i=idx_phases[0]+1; i <= idx_phases[1]; i++) {
 		float t = t_res * (i - idx_phases[0]);
