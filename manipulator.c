@@ -62,6 +62,22 @@ bool manipulator_init(Manipulator *manipulator, float l_0, float l_1, float thet
 	return true;
 }
 
+void manipulator_print_work_area(Manipulator *manipulator){
+	ManipulatorWorkAreaData *work_area = &(manipulator->work_area_data);
+	printf("--- MANIPULATOR WORK AREA ---\n");
+	printf("x >= %.2f\n", work_area->x_min);
+	printf("x^2 + y^2 >= %.2f^2\n", sqrtf(work_area->r_min_sqr));
+	if (manipulator->configuration == RIGHT) {
+		printf("x^2 + y^2 <= %.2f^2 for y <= %.2f\n", sqrtf(work_area->r_max_straight_sqr), work_area->y_border);
+		printf("(x - %.2f)^2 + (y - %.2f)^2 <= %.2f^2 for y > %.2f\n", work_area->x_center_edge, work_area->y_center_edge, sqrtf(work_area->r_max_edge_sqr), work_area->y_border);
+	}
+	else {
+		printf("x^2 + y^2 <= %.2f^2 for y >= %.2f\n", sqrtf(work_area->r_max_straight_sqr), work_area->y_border);
+		printf("(x - %.2f)^2 + (y - %.2f)^2 <= %.2f^2 for y < %.2f\n", work_area->x_center_edge, work_area->y_center_edge, sqrtf(work_area->r_max_edge_sqr), work_area->y_border);
+	}
+	printf("---\n");
+}
+
 bool is_in_range_angle(Manipulator *manipulator, float theta[2]){
 	return theta[0] >= manipulator->theta_0_min && theta[0] <= manipulator->theta_0_max &&
 		   theta[1] >= manipulator->theta_1_min && theta[1] <= manipulator->theta_1_max;
