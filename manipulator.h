@@ -34,7 +34,7 @@ bool is_in_range_angle(Manipulator *manipulator, float theta[2]);
 
 bool is_in_range_work_area(Manipulator *manipulator, float point[2]);
 
-int inverse_kinematics(Manipulator *manipulator , float *in, float *out);
+void inverse_kinematics(Manipulator *manipulator , float *in, float *out);
 
 /*
 Calculates movement phase change moments for a single curve, that is when to:

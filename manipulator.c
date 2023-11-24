@@ -88,13 +88,12 @@ bool is_in_range_work_area(Manipulator *manipulator, float point[2]){
 	return true;
 }
 
-int inverse_kinematics(Manipulator *manipulator, float *in, float *out){
+void inverse_kinematics(Manipulator *manipulator, float *in, float *out){
 	float r = sqrtf(powf(in[0], 2) + powf(in[1], 2));
 	out[0] = atan2f(in[1], in[0]) - manipulator->configuration * acosf((powf(manipulator->l_0, 2) - powf(manipulator->l_1, 2) + powf(r, 2)) /
 			(2 * manipulator->l_0 * r));
 	out[1] = manipulator->configuration * acosf((powf(r, 2) - powf(manipulator->l_0, 2) - powf(manipulator->l_1, 2)) /
 			(2 * manipulator->l_0 * manipulator->l_1));
-	return 0;
 }
 
 bool calc_movement_time(float t_phases_out[3], float p, float v_0, float v_n, float *v_n_corrected){
