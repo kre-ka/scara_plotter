@@ -1,8 +1,6 @@
-# SCARA Drawer
+# SCARA Plotter
 
 This piece of software makes (or will make, as it's a WIP) [SCARA](https://en.wikipedia.org/wiki/SCARA) robotic arm draw shapes defined by splines. Made in C for STM32 microcontroller (not yet integrated).
-
-(Drawer as the thing that draws, not like a containter with an arm. Not the best name, tbh)
 
 ## Why SCARA
 
