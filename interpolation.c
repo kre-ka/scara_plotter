@@ -13,6 +13,32 @@ float lerp(Lerp *lerp, float t){
     return lerp->x_0 + (t - lerp->t_0) * lerp->step;
 }
 
+void quad_interp_init(QuadInterp *interp, float p_0[2], float p_1[2], float p_2[2]) {
+    float denom[3];
+    denom[0] = (p_0[0] - p_1[0]) * (p_0[0] - p_2[0]);
+    denom[1] = (p_1[0] - p_0[0]) * (p_1[0] - p_2[0]);
+    denom[2] = (p_2[0] - p_0[0]) * (p_2[0] - p_1[0]);
+    interp->a = p_0[1] / (denom[0]) + 
+                p_1[1] / (denom[1]) +
+                p_2[1] / (denom[2]);
+    interp->b = -1 * (p_0[1] * (p_1[0] + p_2[0]) / denom[0] + 
+                      p_1[1] * (p_0[0] + p_2[0]) / denom[1] +
+                      p_2[1] * (p_0[0] + p_1[0]) / denom[2]);
+    interp->c = p_0[1] * p_1[0] * p_2[0] / denom[0] +
+                p_1[1] * p_0[0] * p_2[0] / denom[1] +
+                p_2[1] * p_0[0] * p_1[0] / denom[2];
+}
+
+void quad_interp_init_with_a(QuadInterp *interp, float p_0[2], float p_1[2], float a) {
+    interp->a = a;
+    interp->b = (p_1[1] - p_0[1] - interp->a * (powf(p_1[0], 2) + powf(p_0[0], 2))) / (p_1[0] - p_0[0]);
+    interp->c = p_0[1] - interp->a * powf(p_0[0], 2) - interp->b * p_0[0];
+}
+
+float quad_interp(QuadInterp *interp, float t) {
+    return powf(t, 2) * interp->a + t * interp->b + interp->c;
+}
+
 void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_param_num, float (*f)(float, int, float [2][f_param_num]), float f_params[2][f_param_num], float t_span[2], float abs_err_max, float rel_error_max){
     struct _find_interpolation_points_extra_params params;
     params.abs_err_max = abs_err_max;

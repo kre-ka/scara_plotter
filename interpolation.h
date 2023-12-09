@@ -12,6 +12,13 @@ typedef struct {
 void lerp_init(Lerp *lerp, float x_0, float x_n, float t_0, float t_n);
 float lerp(Lerp *lerp, float t);
 
+typedef struct {
+    float a, b, c;
+} QuadInterp;
+
+void quad_interp_init(QuadInterp *interp, float p_0[2], float p_1[2], float p_2[2]);
+void quad_interp_init_with_a(QuadInterp *interp, float p_0[2], float p_1[2], float a);
+float quad_interp(QuadInterp *interp, float t);
 
 struct _find_interpolation_points_extra_params{
     float abs_err_max;
