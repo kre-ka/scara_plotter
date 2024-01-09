@@ -7,6 +7,7 @@
 #include "polynomial.h"
 #include "interpolation.h"
 #include "integration.h"
+#include "path.h"
 
 
 #define RAD_TO_DEG 180/M_PI
@@ -32,7 +33,7 @@ int main(){
     cubic_curve_diff(&curve_diff, &curve);
 
     // find tau_tab_map - points needed to linearly approximate p_integrand(tau) function, where tau is curve parameter and p_integrand is rate of curve length change
-    // this will be used to calculate curve length (p) and tau(p) function
+    // this will be used to calculate p (curve length / distance) and tau(p) function
     float *tau_tab_map_dyn;
     int tab_map_size;
     find_interpolation_points_linear(&tau_tab_map_dyn, &tab_map_size, curve_diff.deg+1, p_integrand_fun, curve_diff.coef, curve_diff.t_span, 1e-2, 1e-2);
@@ -44,7 +45,7 @@ int main(){
     }
     free(tau_tab_map_dyn);
 
-    // calculate p_tab_map - curve length (p) for tau given in tau_tab_map
+    // calculate p_tab_map - p for tau given in tau_tab_map
     float p_integrand_tab[tab_map_size];
     float p_tab_map[tab_map_size];
     for (int i=0; i < tab_map_size; i++){
@@ -54,22 +55,32 @@ int main(){
     printf("path length: %f\n", p_tab_map[tab_map_size-1]);
 
     // find t_phases - time moments to stop acceleration, to start decceleration and end movement to traverse curve, 
-    // given initial and final speed given here, and acceleration and target speed defined in manipulator.h
-    float v_0 = 0;
-    float v_n = 0;
-    float t_phases[3];
+    // given initial and final speed defined here, and acceleration and target speed defined in manipulator.h
+    
+    // make Path struct, from which p(t) trajectory will be constructed
+    Path path;
+    float v_0 = 0;  // initial speed [mm/s]
+    float v_n = 0;  // final speed [mm/s]
     // it's possible to not reach final speed when curve is short and acceleration is low
     // in this case final speed is corrected and should be considered for next curve
-    if (!calc_movement_time(t_phases, p_tab_map[tab_map_size-1], v_0, v_n, &v_n)){
+    if (!path_init(&path, p_tab_map[tab_map_size-1], v_0, &v_n, V_TARGET_DEFAULT, ACC_MAX_DEFAULT)){
         printf("End speed cannot be reached.\n");
     }
-    printf("movement phases moments: %f, %f, %f\n\n", t_phases[0], t_phases[1], t_phases[2]);
+    printf("movement phases moments: %f, %f, %f\n\n", path.t_phases[0], path.t_phases[1], path.t_phases[2]);
 
-    // calculate p_tab_traj - distance trajectory for equally spaced time samples, defined by t_res - time resolution in seconds
+    // calculate p_tab_traj - p trajectory for equally spaced time samples, defined by t_res - time resolution in seconds
     float t_res = 0.02;
-    int tab_traj_size = (int) ceilf(t_phases[2] / t_res);
+    int tab_traj_size = (int) ceilf(path.t_phases[2] / t_res);
     float p_tab_traj[tab_traj_size];
-    calc_p_trajectory(p_tab_traj, t_phases, t_res, p_tab_map[tab_map_size-1], v_0);
+    for (int i=0; i < tab_traj_size; i++) {
+        p_tab_traj[i] = path_calc_p(&path, t_res*i);
+    }
+
+    // print p(t) trajectory
+    for (int i=0; i < tab_traj_size; i++) {
+        printf("%f\t%f\n", t_res*i, p_tab_traj[i]);
+    }
+
 
     // map p_tab_traj into tau_tab_traj - tau values for given time samples, linearly interpolated between map points calculated earlier
     float tau_tab_traj[tab_traj_size];

@@ -29,10 +29,16 @@ void quad_interp_init(QuadInterp *interp, float p_0[2], float p_1[2], float p_2[
                 p_2[1] * p_0[0] * p_1[0] / denom[2];
 }
 
-void quad_interp_init_with_a(QuadInterp *interp, float p_0[2], float p_1[2], float a) {
+void quad_interp_init_with_coef(QuadInterp *interp, float a, float b, float c) {
     interp->a = a;
-    interp->b = (p_1[1] - p_0[1] - interp->a * (powf(p_1[0], 2) + powf(p_0[0], 2))) / (p_1[0] - p_0[0]);
-    interp->c = p_0[1] - interp->a * powf(p_0[0], 2) - interp->b * p_0[0];
+    interp->b = b;
+    interp->c = c;
+}
+
+void quad_interp_init_acceleration(QuadInterp *interp, float acc, float t_0, float x_0, float v_0) {
+    interp->a = acc/2;
+    interp->b = v_0 - 2*interp->a*t_0;
+    interp->c = x_0 - interp->a*powf(t_0, 2) - interp->b*t_0;
 }
 
 float quad_interp(QuadInterp *interp, float t) {

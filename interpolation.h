@@ -17,7 +17,8 @@ typedef struct {
 } QuadInterp;
 
 void quad_interp_init(QuadInterp *interp, float p_0[2], float p_1[2], float p_2[2]);
-void quad_interp_init_with_a(QuadInterp *interp, float p_0[2], float p_1[2], float a);
+void quad_interp_init_with_coef(QuadInterp *interp, float a, float b, float c);
+void quad_interp_init_acceleration(QuadInterp *interp, float acc, float t_0, float x_0, float v_0);
 float quad_interp(QuadInterp *interp, float t);
 
 struct _find_interpolation_points_extra_params{
