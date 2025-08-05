@@ -24,6 +24,6 @@ Returns false and corrects value under v_n_ptr if didn't manage to reach v_n (pr
 */
 bool path_init(Path *path, float p, float v_0, float *v_n_ptr, float v_target, float acc_max);
 
-float path_calc_p(Path *path, float t);
+float path_calc_p(const Path *path, float t);
 
 #endif /* INC_PATH_H_ */

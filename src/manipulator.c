@@ -65,8 +65,8 @@ bool manipulator_init(Manipulator *manipulator, float l_0, float l_1, float thet
 	return true;
 }
 
-void manipulator_print_work_area(Manipulator *manipulator){
-	ManipulatorWorkAreaData *work_area = &(manipulator->work_area_data);
+void manipulator_print_work_area(const Manipulator *manipulator){
+	const ManipulatorWorkAreaData *work_area = &(manipulator->work_area_data);
 	printf("--- MANIPULATOR WORK AREA ---\n");
 	printf("x >= %.2f\n", work_area->x_min);
 	printf("x^2 + y^2 >= %.2f^2\n", sqrtf(work_area->r_min_sqr));
@@ -81,12 +81,12 @@ void manipulator_print_work_area(Manipulator *manipulator){
 	printf("---\n");
 }
 
-bool is_in_range_angle(Manipulator *manipulator, float theta[2]){
+bool is_in_range_angle(const Manipulator *manipulator, const float theta[2]){
 	return theta[0] >= manipulator->theta_0_min && theta[0] <= manipulator->theta_0_max &&
 		   theta[1] >= manipulator->theta_1_min && theta[1] <= manipulator->theta_1_max;
 }
 
-bool is_in_range_work_area(Manipulator *manipulator, float point[2]){
+bool is_in_range_work_area(const Manipulator *manipulator, const float point[2]){
 	// x >= x_min
 	if (point[0] < manipulator->work_area_data.x_min) return false;
 	float r_sqr = powf(point[0], 2) + powf(point[1], 2);
@@ -107,7 +107,7 @@ bool is_in_range_work_area(Manipulator *manipulator, float point[2]){
 	return true;
 }
 
-void inverse_kinematics(Manipulator *manipulator, float in[2], float out[2]){
+void inverse_kinematics(const Manipulator *manipulator, const float in[2], float out[2]){
 	float r = sqrtf(powf(in[0], 2) + powf(in[1], 2));
 	out[0] = atan2f(in[1], in[0]) - manipulator->configuration * acosf((powf(manipulator->l_0, 2) - powf(manipulator->l_1, 2) + powf(r, 2)) /
 			(2 * manipulator->l_0 * r));

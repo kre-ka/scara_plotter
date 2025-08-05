@@ -32,12 +32,12 @@ typedef struct {
 
 bool manipulator_init(Manipulator *manipulator, float l_0, float l_1, float theta_0_min, float theta_0_max, float theta_1_min, float theta_1_max);
 
-void manipulator_print_work_area(Manipulator *manipulator);
+void manipulator_print_work_area(const Manipulator *manipulator);
 
-bool is_in_range_angle(Manipulator *manipulator, float theta[2]);
+bool is_in_range_angle(const Manipulator *manipulator, const float theta[2]);
 
-bool is_in_range_work_area(Manipulator *manipulator, float point[2]);
+bool is_in_range_work_area(const Manipulator *manipulator, const float point[2]);
 
-void inverse_kinematics(Manipulator *manipulator , float in[2], float out[2]);
+void inverse_kinematics(const Manipulator *manipulator , const float in[2], float out[2]);
 
 #endif /* INC_MANIPULATOR_H_ */

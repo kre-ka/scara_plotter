@@ -9,11 +9,11 @@ void lerp_init(Lerp *lerp, float x_0, float x_n, float t_0, float t_n){
     lerp->t_0 = t_0;
 }
 
-float lerp(Lerp *lerp, float t){
+float lerp(const Lerp *lerp, float t){
     return lerp->x_0 + (t - lerp->t_0) * lerp->step;
 }
 
-void quad_interp_init(QuadInterp *interp, float p_0[2], float p_1[2], float p_2[2]) {
+void quad_interp_init(QuadInterp *interp, const float p_0[2], const float p_1[2], const float p_2[2]) {
     float denom[3];
     denom[0] = (p_0[0] - p_1[0]) * (p_0[0] - p_2[0]);
     denom[1] = (p_1[0] - p_0[0]) * (p_1[0] - p_2[0]);
@@ -41,11 +41,11 @@ void quad_interp_init_acceleration(QuadInterp *interp, float acc, float t_0, flo
     interp->c = x_0 - interp->a*powf(t_0, 2) - interp->b*t_0;
 }
 
-float quad_interp(QuadInterp *interp, float t) {
+float quad_interp(const QuadInterp *interp, float t) {
     return powf(t, 2) * interp->a + t * interp->b + interp->c;
 }
 
-void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_param_num, float (*f)(float, int, float [2][f_param_num]), float f_params[2][f_param_num], float t_span[2], float abs_err_max, float rel_error_max){
+void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_param_num, const float (*f)(float, int, const float [2][f_param_num]), const float f_params[2][f_param_num], const float t_span[2], float abs_err_max, float rel_error_max){
     struct _find_interpolation_points_extra_params params;
     params.abs_err_max = abs_err_max;
     params.rel_error_max = rel_error_max;
@@ -77,7 +77,7 @@ void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_
     tree_free(t_tab_root);
 }
 
-void _find_interpolation_points_linear(int f_param_num, float (*f)(float, int, float [2][f_param_num]), float f_params[2][f_param_num], struct _find_interpolation_points_extra_params *extra_params, float t_tab[2], float f_tab[2], TreeNode *t_out_root){
+void _find_interpolation_points_linear(int f_param_num, const float (*f)(float, int, const float [2][f_param_num]), const float f_params[2][f_param_num], const struct _find_interpolation_points_extra_params *extra_params, const float t_tab[2], const float f_tab[2], TreeNode *t_out_root){
     float t_test[3];
     float f_test_true[3];
     float f_test_interpolated[3];
@@ -116,7 +116,7 @@ void _find_interpolation_points_linear(int f_param_num, float (*f)(float, int, f
     }
 }
 
-void lerp_map(float *x_out, float *t_in, int t_in_size, float *t_map, float *x_map, int map_size){
+void lerp_map(float *x_out, const float *t_in, int t_in_size, const float *t_map, const float *x_map, int map_size){
     int idx_map = 0;
     Lerp lerp_data;
     lerp_init(&lerp_data, x_map[0], x_map[1], t_map[0], t_map[1]);

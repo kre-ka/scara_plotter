@@ -55,7 +55,7 @@ bool path_init(Path *path, float p, float v_0, float *v_n_ptr, float v_target, f
 	return success;
 }
 
-float path_calc_p(Path *path, float t) {
+float path_calc_p(const Path *path, float t) {
     // acceleration
     if (t < path->t_phases[0]) {
         return quad_interp(&(path->acc_interp), t);
