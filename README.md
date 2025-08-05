@@ -8,7 +8,7 @@ Cartesian would be better, but SCARA is cooler, and it's most of all a fun proje
 
 ## Inner machinations
 
-TODO, for now just follow comments in [main.c](main.c).
+TODO, for now just follow comments in [main.c](src/main.c).
 
 ## TODO
 - make TODO list
