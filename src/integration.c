@@ -1,8 +1,7 @@
 #include "integration.h"
 
-void integrate_trapezoid(float *out, int num_points, const float *t, const float *x){
-    out[0] = 0.0;
-    for (int i=1; i < num_points; i++){
-        out[i] = out[i-1] + (t[i] - t[i-1]) * (x[i] + x[i-1]) / 2;
-    }
+float integrate_step_trapezoid(const float x[2], const float t[2]){
+    float out = (x[1] + x[0]) * (t[1] - t[0]) / 2;
+
+    return out;
 }

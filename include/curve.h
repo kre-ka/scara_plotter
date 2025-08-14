@@ -18,7 +18,15 @@ void cubic_curve_init_bezier(CubicCurve *curve, const float points[4][2]);
 
 void cubic_curve_diff(QuadraticCurve *out, const CubicCurve *in);
 
-float p_integrand_fun(float t, int poly_deg, const float curve_diff_coef[2][poly_deg+1]);
+/*
+Returns rate of curve length change (dp/dt) for given curve parameter.
+
+Parameters:
+- t - curve parameter value
+- poly_deg - curve polynomial degree
+- curve_diff_coef - curve differential coefficients
+*/
+float dp_dt_fun(float t, int poly_deg, const float curve_diff_coef[2][poly_deg+1]);
 
 /*
 Populates tables for p(t) mapping function - curve length (p) for given curve parameter (t).

@@ -31,7 +31,7 @@ void cubic_curve_diff(QuadraticCurve *out, const CubicCurve *in){
     out->deg = 2;
 }
 
-float p_integrand_fun(float t, int poly_deg, const float curve_diff_coef[2][poly_deg+1]){
+float dp_dt_fun(float t, int poly_deg, const float curve_diff_coef[2][poly_deg+1]){
     float curve_diff_eval[2];
     curve_diff_eval[0] = poly_eval_f(t, curve_diff_coef[0], poly_deg);
     curve_diff_eval[1] = poly_eval_f(t, curve_diff_coef[1], poly_deg);
@@ -47,23 +47,28 @@ void make_p_t_map_tables(float **out_p, float **out_t, int *size_ptr, const Cubi
     // find `t` values between which `p` changes (approximately) linearly
     float *t_tab;
     int tab_size;
-    find_interpolation_points_linear(&t_tab, &tab_size, curve_diff.deg+1, p_integrand_fun, curve_diff.coef, curve_diff.t_span, abs_err_max, rel_error_max);
+    find_interpolation_points_linear(&t_tab, &tab_size, curve_diff.deg+1, dp_dt_fun, curve_diff.coef, curve_diff.t_span, abs_err_max, rel_error_max);
     
-    // calculate `p` values for given `t`s
-    // first, calculate `p` integrands - rates of `p` change (dp/dt)
-    // TODO: remove this table - get p_integrand step by step while calculating p
-    float p_integrand_tab[tab_size];
-    for (int i=0; i < tab_size; i++){
-        p_integrand_tab[i] = p_integrand_fun(t_tab[i], curve_diff.deg, curve_diff.coef);
-    }
-    // then integrate them into `p` values
+    // // calculate `p` values for given `t`s by integrating rates of `p` change (dp/dt)
     float *p_tab;
     p_tab = malloc(tab_size * sizeof(float));
-    integrate_trapezoid(p_tab, tab_size, t_tab, p_integrand_tab);
+    // set initial `p` value (note that the loop starts on 1)
+    p_tab[0] = 0.0;
+    // initialize dp_dt data
+    // only 2 samples are needed at the time, no need to store all of them
+    float dp_dt[2];
+    dp_dt[1] = dp_dt_fun(t_tab[0], curve_diff.deg, curve_diff.coef);
+    for (int i=1; i < tab_size; i++){
+        // move integrand data one sample forward
+        dp_dt[0] = dp_dt[1];
+        dp_dt[1] = dp_dt_fun(t_tab[i], curve_diff.deg, curve_diff.coef);
+
+        p_tab[i] = p_tab[i-1] + integrate_step_trapezoid(dp_dt, &t_tab[i-1]);
+    }
+
+    printf("path length: %f\n", p_tab[tab_size-1]);
 
     *out_p = p_tab;
     *out_t = t_tab;
     *size_ptr = tab_size;
-    
-    printf("path length: %f\n", p_tab[tab_size-1]);
 }
