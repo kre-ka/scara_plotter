@@ -29,17 +29,16 @@ Parameters:
 float dp_dt_fun(float t, int poly_deg, const float curve_diff_coef[2][poly_deg+1]);
 
 /*
-Populates tables for p(t) mapping function - curve length (p) for given curve parameter (t).
+Populates table for t(p) mapping function - curve parameter (t) for given curve length (p).
 The function is expected to be a linear interpolation between table points.
 
 Parameters:
-- out_p - curve length (distance from the start) table
-- out_t - curve parameter
-- size_ptr - number of table elements
+- out_p_t - curve length (distance from the start) and corresponding curve parameter table
+- size_ptr - number of table rows
 - curve - curve to follow
 - abs_err_max - maximum allowed absolute error [mm]
 - rel_error_max - maximum allowed relative error
 */
-void make_p_t_map_tables(float **out_p, float **out_t, int *size_ptr, const CubicCurve *curve, float abs_err_max, float rel_error_max);
+void make_p_t_map_table(float (**out_p_t)[2], int *size_ptr, const CubicCurve *curve, float abs_err_max, float rel_error_max);
 
 #endif /* INC_CURVE_H_ */

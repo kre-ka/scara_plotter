@@ -9,55 +9,114 @@
 #include "polynomial.h"
 #include "interpolation.h"
 #include "integration.h"
-#include "path.h"
 
 
-void make_trajectory_single_curve(float (**out)[2], int *out_size_ptr, const CubicCurve *curve, float t_res, float v_0, float v_target, float *v_n_ptr, float acc_max){
-    float *p_tab_map;
-    float *tau_tab_map;
-    int tab_map_size;
-    make_p_t_map_tables(&p_tab_map, &tau_tab_map, &tab_map_size, curve, 1e-2, 1e-2);
+bool trajectory_init(Trajectory *trajectory, CubicCurve path, float abs_err_max, float rel_error_max, float v_0, float v_target, float *v_f_ptr, float acc){
+    trajectory->path = path;
 
-    // find t_phases - time moments to change movement phase - stop acceleration, start decceleration and end movement, 
-    // given initial and final speed, target speed and acceleration
-    // TODO: evaluate trajectory points one at a time - to avoid creating large arrays of size unknown at compile time
-    
-    // make Path struct, from which p(t) trajectory will be constructed
-    Path path;
+    make_p_t_map_table(&(trajectory->p_tau_map), &(trajectory->p_tau_map_size), &(trajectory->path), abs_err_max, rel_error_max);
+
     // it's possible to not reach final speed when curve is short and acceleration is low
     // in this case final speed is corrected and should be considered for next curve
-    if (!path_init(&path, p_tab_map[tab_map_size-1], v_0, v_n_ptr, v_target, acc_max)){
+    bool success = true;
+    if (!_calc_t_phases_interpolators(trajectory, v_0, v_target, v_f_ptr, acc)){
+        success = false;
         printf("End speed cannot be reached.\n");
     }
-    printf("movement phases moments: %f, %f, %f\n\n", path.t_phases[0], path.t_phases[1], path.t_phases[2]);
+    printf("movement phases moments: %f, %f, %f\n\n", trajectory->t_phases[0], trajectory->t_phases[1], trajectory->t_phases[2]);
+
+    return success;
+}
+
+void trajectory_get_xy(float (*out_xy)[2], const Trajectory *trajectory, float t){
+    // get path length p for time t
+    float p = _trajectory_calc_p(trajectory, t);
+
+    // get curve parameter tau for p
+    Lerp lerp;
+    int idx_map = 0;
+    // can't give this guy const p_tau_map
+    float tau = lerp_map_ascending_optimized(p, &lerp, &idx_map, &(trajectory->p_tau_map), trajectory->p_tau_map_size);
+
+    // get x, y coordinates for tau
+    (*out_xy)[0] = poly_eval_f(tau, trajectory->path.coef[0], trajectory->path.deg);
+    (*out_xy)[1] = poly_eval_f(tau, trajectory->path.coef[1], trajectory->path.deg);
+}
+
+float _trajectory_calc_p(const Trajectory *trajectory, float t) {
+    // acceleration
+    if (t < trajectory->t_phases[0]) {
+        return quad_interp(&(trajectory->acc_interp), t);
+    }
+    // constant speed
+    else if (t < trajectory->t_phases[1]) {
+        return lerp(&(trajectory->const_v_interp), t);
+    }
+    // decceleration
+    else if (t <= trajectory->t_phases[2]) {
+        return quad_interp(&(trajectory->dcc_interp), t);
+    }
+    // out of upper bound
+    else {
+        // return target p
+        return quad_interp(&(trajectory->dcc_interp), trajectory->t_phases[2]);
+    }
+}
+
+bool _calc_t_phases_interpolators(Trajectory *trajectory, float v_0, float v_target, float *v_f_ptr, float acc) {
+    // full path length
+    float p = trajectory->p_tau_map[trajectory->p_tau_map_size-1][0];
     
-    // calculate p_tab_traj - p trajectory for equally spaced time samples, defined by t_res - time resolution in seconds
-    int tab_traj_size = (int) ceilf(path.t_phases[2] / t_res);
-    float p_tab_traj[tab_traj_size];
-    for (int i=0; i < tab_traj_size; i++) {
-        p_tab_traj[i] = path_calc_p(&path, t_res*i);
-    }
+    float v_f = *v_f_ptr;
+    float t_acc, t_const_v, t_dcc;  // acceleration time, constant speed time, decceleration time
+	float p_acc, p_const_v, p_dcc;  // similar, but for path length
 
-    // print p(t) trajectory
-    for (int i=0; i < tab_traj_size; i++) {
-        printf("%f\t%f\n", t_res*i, p_tab_traj[i]);
-    }
+	t_acc = (v_target - v_0) / acc;
+	t_dcc = (v_target - v_f) / acc;
+	
+	p_acc = (acc * powf(t_acc, 2) / 2) + (v_0 * t_acc);
+	p_dcc = (v_target * t_dcc) - (acc * powf(t_dcc, 2) / 2);
+	p_const_v = p - p_acc - p_dcc;
 
-    // map p_tab_traj into tau_tab_traj - tau values for given time samples, linearly interpolated between map points calculated earlier
-    float tau_tab_traj[tab_traj_size];
-    lerp_map(tau_tab_traj, p_tab_traj, tab_traj_size, p_tab_map, tau_tab_map, tab_map_size);
+	t_const_v = p_const_v / v_target;
 
-    free(p_tab_map);
-    free(tau_tab_map);
+	bool success = true;
+	// if didn't manage to reach target speed
+	if (p_const_v < 0.0) {
+		t_acc = (sqrtf(4*acc*p + 3*powf(v_0, 2) - 4*v_0*v_f + 2*powf(v_f, 2)) - v_0) / (2*acc);
+		t_dcc = (v_0 - v_f) / acc + t_acc;
+		t_const_v = 0;
+		p_const_v = 0;
+		v_target = t_acc * acc;
 
-    // evaluate (x, y) coordinates for tau_tab_traj
-    float xy_tab_traj[tab_traj_size][2];
-    for (int i=0; i < tab_traj_size; i++) {
-        xy_tab_traj[i][0] = poly_eval_f(tau_tab_traj[i], curve->coef[0], curve->deg);
-        xy_tab_traj[i][1] = poly_eval_f(tau_tab_traj[i], curve->coef[1], curve->deg);
-    }
+		// if didn't manage to reach v_f
+		if (t_dcc < 0.0) {
+			t_acc = (sqrtf(2*acc*p + powf(v_0,2)) - v_0) / acc;
+			t_dcc = 0;
 
-    *out = malloc(sizeof(xy_tab_traj));
-    memcpy(*out, xy_tab_traj, sizeof(xy_tab_traj));
-    *out_size_ptr = tab_traj_size;
+			p_acc = (acc * powf(t_acc, 2) / 2) + (v_0 * t_acc);
+			p_dcc = 0;
+
+            v_f = acc * t_acc;
+
+			// set corrected v_f value
+			*v_f_ptr = v_f;
+			success = false;
+		}
+	}
+
+	trajectory->t_phases[0] = t_acc;
+	trajectory->t_phases[1] = t_acc + t_const_v;
+	trajectory->t_phases[2] = t_acc + t_const_v + t_dcc;
+
+	float p_phases[3];
+	p_phases[0] = p_acc;
+	p_phases[1] = p_acc + p_const_v;
+	p_phases[2] = p_acc + p_const_v + p_dcc;
+
+	quad_interp_init_acceleration(&(trajectory->acc_interp), acc, 0, 0, v_0);
+	lerp_init(&(trajectory->const_v_interp), p_phases[0], p_phases[1], trajectory->t_phases[0], trajectory->t_phases[1]);
+	quad_interp_init_acceleration(&(trajectory->dcc_interp), -acc, trajectory->t_phases[1], p_phases[1], v_target);
+
+	return success;
 }

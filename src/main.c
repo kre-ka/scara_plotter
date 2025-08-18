@@ -28,41 +28,46 @@ int main(){
     cubic_curve_init_bezier(&curve, points);
 
     // create time-spatial trajectory from curve
-    float (*xy_tab_traj)[2];
-    int tab_traj_size;
+    Trajectory trajectory;
     float v_n = 0.0;
-    make_trajectory_single_curve(
-        &xy_tab_traj, 
-        &tab_traj_size, 
-        &curve, 
-        0.02, 
-        0.0, 
-        V_TARGET_DEFAULT, 
-        &v_n, 
-        ACC_MAX_DEFAULT);
+    trajectory_init(
+        &trajectory, 
+        curve, 
+        1e-2, 
+        1e-2, 
+        0.0,
+        V_TARGET_DEFAULT,
+        &v_n,
+        ACC_MAX_DEFAULT
+    );
 
+    // execute trajectory one point at the time
+    float t_res = 0.02;
+    int i = 0;
+    float t = i * t_res;
+    float xy[2];
+    float theta[2];
     printf("\n");
-    printf("trajectory points\nx\ty\n");
-    for (int i=0; i <tab_traj_size; i++) {
-        printf("%f\t%f\n", xy_tab_traj[i][0], xy_tab_traj[i][1]);
-    }
+    while (t < trajectory.t_phases[2]) {
+        trajectory_get_xy(&xy, &trajectory, t);
+        printf("t: %f\tx: %f\ty: %f\t", t, xy[0], xy[1]);
 
-    // check if all points are in manipulator range
-    // TODO: maybe don't check all the points
-    for (int i=0; i < tab_traj_size; i++) {
-        if (!is_in_range_work_area(&manipulator, xy_tab_traj[i])) {
-            printf("Point (%f, %f) out of manipulator range.\n", xy_tab_traj[i][0], xy_tab_traj[i][1]);
+        // check if point is in manipulator range
+        // TODO: maybe don't check all the points
+        if (!is_in_range_work_area(&manipulator, xy)) {
+            printf("Point (%f, %f) out of manipulator range.\n", xy[0], xy[1]);
             return 1;
         }
-    }
-    
-    // calculate inverse kinematics (manipulator joint angles) for trajectory points
-    float theta_tab_traj[tab_traj_size][2];
-    for (int i=0; i < tab_traj_size; i++) {
-        inverse_kinematics(&manipulator, xy_tab_traj[i], theta_tab_traj[i]);
-    }
 
-    free(xy_tab_traj);
+        // calculate manipulator joint angles
+        inverse_kinematics(&manipulator, xy, theta);
+        printf("t0: %f\t t1: %f", theta[0], theta[1]);
+
+        printf("\n");
+
+        i++;
+        t = i * t_res;
+    }
     
     return 0;
 }

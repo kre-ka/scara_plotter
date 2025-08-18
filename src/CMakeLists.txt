@@ -9,7 +9,6 @@ add_library(scara_plotter_lib
     integration.c
     interpolation.c
     manipulator.c
-    path.c
     polynomial.c
     trajectory.c
     )

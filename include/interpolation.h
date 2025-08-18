@@ -32,8 +32,26 @@ void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_
 void _find_interpolation_points_linear(int f_param_num, const float (*f)(float, int, const float [2][f_param_num]), const float f_params[2][f_param_num], const struct _find_interpolation_points_extra_params *extra_params, const float t_tab[2], const float f_tab[2], TreeNode *t_out_root);
 
 /*
-Maps t_in to x_out using linear interpolation between t_map to x_map lookup table points
+Returns value mapped from t using linear interpolation between t_x_map lookup table points.
+
+Parameters:
+- t - input value
+- t_x_map - lookup table of corresponding t (input) and x (output) values
+- map_size - number of t_x_map rows (t_x pairs)
 */
-void lerp_map(float *x_out, const float *t_in, int t_in_size, const float *t_map, const float *x_map, int map_size);
+float lerp_map(float t, const float (**t_x_map)[2], int map_size);
+
+/*
+Returns value mapped from t using linear interpolation between t_x_map lookup table points.
+Accelerates consecutive lerps when t values are ascending. Can only be used with ascending t. 
+
+Parameters:
+- t - input value
+- lerp_s - Lerp structure - to be preserved between calls
+- idx_map_ptr - current lookup table index - to be preserved between calls
+- t_x_map - lookup table of corresponding t (input) and x (output) values
+- map_size - number of t_x_map rows (t_x pairs)
+*/
+float lerp_map_ascending_optimized(float t, Lerp *lerp_s, int *idx_map_ptr, const float (**t_x_map)[2], int map_size);
 
 #endif /* INC_INTERPOLATION_H_ */

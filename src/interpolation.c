@@ -1,6 +1,7 @@
 #include "interpolation.h"
 #include <math.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 
 void lerp_init(Lerp *lerp, float x_0, float x_n, float t_0, float t_n){
@@ -116,15 +117,38 @@ void _find_interpolation_points_linear(int f_param_num, const float (*f)(float, 
     }
 }
 
-void lerp_map(float *x_out, const float *t_in, int t_in_size, const float *t_map, const float *x_map, int map_size){
-    int idx_map = 0;
-    Lerp lerp_data;
-    lerp_init(&lerp_data, x_map[0], x_map[1], t_map[0], t_map[1]);
-    for (int i=0; i < t_in_size; i++) {
-        while (t_in[i] > t_map[idx_map+1]){
-            idx_map++;
-            lerp_init(&lerp_data, x_map[idx_map], x_map[idx_map+1], t_map[idx_map], t_map[idx_map+1]);
-        }
-        x_out[i] = lerp(&lerp_data, t_in[i]);
+float lerp_map(float t, const float (**t_x_map)[2], int map_size){
+    // increase map index until t is in range
+    // also check if t is in map range
+    int i = 0;
+    while (t < (*t_x_map)[map_size-1][0] && (*t_x_map)[i][0] <= t) {
+        // this should trigger on first call too
+        i++;
     }
+
+    Lerp lerp_s;
+    lerp_init(&lerp_s, (*t_x_map)[i-1][1], (*t_x_map)[i][1], (*t_x_map)[i-1][0], (*t_x_map)[i][0]);
+
+    return lerp(&lerp_s, t);
+}
+
+float lerp_map_ascending_optimized(float t, Lerp *lerp_s, int *idx_map_ptr, const float (**t_x_map)[2], int map_size){
+    // increase map index until t is in range
+    // also check if t is in map range
+    int i = *idx_map_ptr;
+    bool is_lerp_updated = false;
+    while (t < (*t_x_map)[map_size-1][0] && (*t_x_map)[i][0] <= t) {
+        // this should trigger on first call too
+        is_lerp_updated = true;
+        i++;
+    }
+    // init lerp with proper range data
+    // only when range changes
+    if (is_lerp_updated) {
+        lerp_init(lerp_s, (*t_x_map)[i-1][1], (*t_x_map)[i][1], (*t_x_map)[i-1][0], (*t_x_map)[i][0]);
+    }
+
+    *idx_map_ptr = i;
+
+    return lerp(lerp_s, t);
 }
