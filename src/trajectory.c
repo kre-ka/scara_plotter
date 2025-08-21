@@ -28,6 +28,10 @@ bool trajectory_init(Trajectory *trajectory, CubicCurve path, float abs_err_max,
     return success;
 }
 
+void trajectory_free(Trajectory *trajectory) {
+    free(trajectory->p_tau_map);
+}
+
 void trajectory_get_xy(float (*out_xy)[2], const Trajectory *trajectory, float t){
     // get path length p for time t
     float p = _trajectory_calc_p(trajectory, t);

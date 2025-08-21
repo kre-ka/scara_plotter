@@ -68,6 +68,7 @@ int main(){
         i++;
         t = i * t_res;
     }
+    trajectory_free(&trajectory);
     
     return 0;
 }

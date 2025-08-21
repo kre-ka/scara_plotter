@@ -19,6 +19,7 @@ typedef struct {
 
 /*
 Returns false and corrects value under v_f_ptr if didn't manage to reach desired v_f (probably will never happen though).
+Follow with call to trajectory_free when you're done using it.
 
 Params:
 - trajectory
@@ -31,6 +32,11 @@ Params:
 - acc - acceleration and decceleration [mm/s^2]
 */
 bool trajectory_init(Trajectory *trajectory, CubicCurve path, float abs_err_max, float rel_error_max, float v_0, float v_target, float *v_f_ptr, float acc);
+
+/*
+Frees dynamic memory allocated by trajectory
+*/
+void trajectory_free(Trajectory *trajectory);
 
 void trajectory_get_xy(float (*out_xy)[2], const Trajectory *trajectory, float t);
 

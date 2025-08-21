@@ -33,12 +33,12 @@ Populates table for t(p) mapping function - curve parameter (t) for given curve 
 The function is expected to be a linear interpolation between table points.
 
 Parameters:
-- out_p_t - curve length (distance from the start) and corresponding curve parameter table
+- out_p_t_dyn - curve length (distance from the start) and corresponding curve parameter table; it is pointing to dynamically allocated memory
 - size_ptr - number of table rows
 - curve - curve to follow
 - abs_err_max - maximum allowed absolute error [mm]
 - rel_error_max - maximum allowed relative error
 */
-void make_p_t_map_table(float (**out_p_t)[2], int *size_ptr, const CubicCurve *curve, float abs_err_max, float rel_error_max);
+void make_p_t_map_table(float (**out_p_t_dyn)[2], int *size_ptr, const CubicCurve *curve, float abs_err_max, float rel_error_max);
 
 #endif /* INC_CURVE_H_ */
