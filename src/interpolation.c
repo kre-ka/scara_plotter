@@ -46,10 +46,9 @@ float quad_interp(const QuadInterp *interp, float t) {
     return powf(t, 2) * interp->a + t * interp->b + interp->c;
 }
 
-void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_param_num, const float (*f)(float, int, const float [2][f_param_num]), const float f_params[2][f_param_num], const float t_span[2], float abs_err_max, float rel_error_max){
+void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_param_num, const float (*f)(float, int, const float [2][f_param_num]), const float f_params[2][f_param_num], const float t_span[2], float abs_err_max){
     struct _find_interpolation_points_extra_params params;
     params.abs_err_max = abs_err_max;
-    params.rel_error_max = rel_error_max;
     
     params.test_points[0] = 0.25;
     params.test_points[1] = 0.5;
@@ -97,8 +96,7 @@ void _find_interpolation_points_linear(int f_param_num, const float (*f)(float, 
 
     for (int i=0; i < 3; i++){
         float abs_error = fabs(f_test_interpolated[i] - f_test_true[i]);
-        float rel_error = abs_error / f_test_true[i];
-        if (abs_error > extra_params->abs_err_max || rel_error > extra_params->rel_error_max){
+        if (abs_error > extra_params->abs_err_max){
             float t_tab_new[] = {t_tab[0], t_test[0], t_test[1]};
             float f_tab_new[] = {f_tab[0], f_test_true[0], f_test_true[1]};
             tree_add_node_left(t_out_root, t_tab_new[0]);

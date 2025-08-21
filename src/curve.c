@@ -39,7 +39,7 @@ float dp_dt_fun(float t, int poly_deg, const float curve_diff_coef[2][poly_deg+1
     return sqrtf(powf(curve_diff_eval[0], 2) + powf(curve_diff_eval[1], 2));
 }
 
-void make_p_t_map_table(float (**out_p_t_dyn)[2], int *size_ptr, const CubicCurve *curve, float abs_err_max, float rel_error_max){
+void make_p_t_map_table(float (**out_p_t_dyn)[2], int *size_ptr, const CubicCurve *curve, float abs_err_max){
     // curve differential is needed for path length computations
     QuadraticCurve curve_diff;
     cubic_curve_diff(&curve_diff, curve);
@@ -47,7 +47,7 @@ void make_p_t_map_table(float (**out_p_t_dyn)[2], int *size_ptr, const CubicCurv
     // find `t` values between which `p` changes (approximately) linearly
     float *t_tab;
     int tab_size;
-    find_interpolation_points_linear(&t_tab, &tab_size, curve_diff.deg+1, dp_dt_fun, curve_diff.coef, curve_diff.t_span, abs_err_max, rel_error_max);
+    find_interpolation_points_linear(&t_tab, &tab_size, curve_diff.deg+1, dp_dt_fun, curve_diff.coef, curve_diff.t_span, abs_err_max);
     
     // // calculate `p` values for given `t`s by integrating rates of `p` change (dp/dt)
     float *p_tab;
