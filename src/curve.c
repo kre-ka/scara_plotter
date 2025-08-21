@@ -33,8 +33,8 @@ void cubic_curve_diff(QuadraticCurve *out, const CubicCurve *in){
 
 float dp_dt_fun(float t, int poly_deg, const float curve_diff_coef[2][poly_deg+1]){
     float curve_diff_eval[2];
-    curve_diff_eval[0] = poly_eval_f(t, curve_diff_coef[0], poly_deg);
-    curve_diff_eval[1] = poly_eval_f(t, curve_diff_coef[1], poly_deg);
+    curve_diff_eval[0] = poly_eval_f(t, poly_deg, curve_diff_coef[0]);
+    curve_diff_eval[1] = poly_eval_f(t, poly_deg, curve_diff_coef[1]);
 
     return sqrtf(powf(curve_diff_eval[0], 2) + powf(curve_diff_eval[1], 2));
 }

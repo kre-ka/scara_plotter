@@ -74,7 +74,7 @@ void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_
     *t_out_dyn = malloc(size * sizeof(float));
     if (!*t_out_dyn) exit(EXIT_FAILURE);
     int idx = 0;
-    tree_leaves_to_array(t_tab_root, *t_out_dyn, &idx);
+    tree_leaves_to_array(t_tab_root, t_out_dyn, &idx);
     tree_free(t_tab_root);
 }
 

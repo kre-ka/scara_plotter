@@ -27,14 +27,14 @@ void tree_free(TreeNode *root){
     free(root);
 }
 
-void tree_leaves_to_array(const TreeNode *root, float *out, int *idx_ptr){
+void tree_leaves_to_array(const TreeNode *root, float **out, int *idx_ptr){
     if (!root) return;
     if (root->left || root->right) {
         tree_leaves_to_array(root->left, out, idx_ptr);
         tree_leaves_to_array(root->right, out, idx_ptr);
     }
     else {
-        out[*idx_ptr] = root->data;
+        (*out)[*idx_ptr] = root->data;
         (*idx_ptr)++;
     }
 }

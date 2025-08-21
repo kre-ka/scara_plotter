@@ -39,8 +39,8 @@ void trajectory_get_xy(float (*out_xy)[2], const Trajectory *trajectory, float t
     float tau = lerp_map_ascending_optimized(p, &lerp, &idx_map, &(trajectory->p_tau_map), trajectory->p_tau_map_size);
 
     // get x, y coordinates for tau
-    (*out_xy)[0] = poly_eval_f(tau, trajectory->path.coef[0], trajectory->path.deg);
-    (*out_xy)[1] = poly_eval_f(tau, trajectory->path.coef[1], trajectory->path.deg);
+    (*out_xy)[0] = poly_eval_f(tau, trajectory->path.deg, trajectory->path.coef[0]);
+    (*out_xy)[1] = poly_eval_f(tau, trajectory->path.deg, trajectory->path.coef[1]);
 }
 
 float _trajectory_calc_p(const Trajectory *trajectory, float t) {
