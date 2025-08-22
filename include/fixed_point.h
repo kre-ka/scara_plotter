@@ -1,7 +1,6 @@
 #ifndef INC_FIXED_POINT_H_
 #define INC_FIXED_POINT_H_
 
-
 typedef int Q15_16;
 #define SCALE_Q15_16 16
 
