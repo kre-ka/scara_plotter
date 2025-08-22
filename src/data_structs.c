@@ -27,11 +27,16 @@ void tree_free(TreeNode *root){
     free(root);
 }
 
-void tree_leaves_to_array(float **out, const TreeNode *root, int *idx_ptr){
+void tree_leaves_to_array(float **out, const TreeNode *root){
+    int idx = 0;
+    _tree_leaves_to_array(out, root, &idx);
+}
+
+void _tree_leaves_to_array(float **out, const TreeNode *root, int *idx_ptr){
     if (!root) return;
     if (root->left || root->right) {
-        tree_leaves_to_array(out, root->left, idx_ptr);
-        tree_leaves_to_array(out, root->right, idx_ptr);
+        _tree_leaves_to_array(out, root->left, idx_ptr);
+        _tree_leaves_to_array(out, root->right, idx_ptr);
     }
     else {
         (*out)[*idx_ptr] = root->data;
