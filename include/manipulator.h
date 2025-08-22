@@ -38,6 +38,6 @@ bool is_in_range_angle(const Manipulator *manipulator, const float theta[2]);
 
 bool is_in_range_work_area(const Manipulator *manipulator, const float point[2]);
 
-void inverse_kinematics(const Manipulator *manipulator , const float in[2], float out[2]);
+void inverse_kinematics(float out[2], const Manipulator *manipulator , const float in[2]);
 
 #endif /* INC_MANIPULATOR_H_ */

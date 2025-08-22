@@ -107,7 +107,7 @@ bool is_in_range_work_area(const Manipulator *manipulator, const float point[2])
 	return true;
 }
 
-void inverse_kinematics(const Manipulator *manipulator, const float in[2], float out[2]){
+void inverse_kinematics(float out[2], const Manipulator *manipulator, const float in[2]){
 	float r = sqrtf(powf(in[0], 2) + powf(in[1], 2));
 	out[0] = atan2f(in[1], in[0]) - manipulator->configuration * acosf((powf(manipulator->l_0, 2) - powf(manipulator->l_1, 2) + powf(r, 2)) /
 			(2 * manipulator->l_0 * r));

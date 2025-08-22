@@ -46,7 +46,7 @@ float quad_interp(const QuadInterp *interp, float t) {
     return powf(t, 2) * interp->a + t * interp->b + interp->c;
 }
 
-void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_param_num, const float (*f)(float, int, const float [2][f_param_num]), const float f_params[2][f_param_num], const float t_span[2], float abs_err_max){
+void find_interpolation_points_linear(float **out_t_dyn, int *out_t_size, int f_param_num, const float (*f)(float, int, const float [2][f_param_num]), const float f_params[2][f_param_num], const float t_span[2], float abs_err_max){
     struct _find_interpolation_points_extra_params params;
     params.abs_err_max = abs_err_max;
     
@@ -65,19 +65,19 @@ void find_interpolation_points_linear(float **t_out_dyn, int *t_tab_size, int f_
         f_tab_init[i] = (*f)(t_tab_init[i], f_param_num-1, f_params);
     }
 
-    _find_interpolation_points_linear(f_param_num, f, f_params, &params, t_tab_init, f_tab_init, t_tab_root->left);
+    _find_interpolation_points_linear(t_tab_root->left, f_param_num, f, f_params, &params, t_tab_init, f_tab_init);
 
     int size = 0;
-    tree_leaves_to_array_get_size(t_tab_root, &size);
-    *t_tab_size = size;
-    *t_out_dyn = malloc(size * sizeof(float));
-    if (!*t_out_dyn) exit(EXIT_FAILURE);
+    tree_leaves_to_array_get_size(&size, t_tab_root);
+    *out_t_size = size;
+    *out_t_dyn = malloc(size * sizeof(float));
+    if (!*out_t_dyn) exit(EXIT_FAILURE);
     int idx = 0;
-    tree_leaves_to_array(t_tab_root, t_out_dyn, &idx);
+    tree_leaves_to_array(out_t_dyn, t_tab_root, &idx);
     tree_free(t_tab_root);
 }
 
-void _find_interpolation_points_linear(int f_param_num, const float (*f)(float, int, const float [2][f_param_num]), const float f_params[2][f_param_num], const struct _find_interpolation_points_extra_params *extra_params, const float t_tab[2], const float f_tab[2], TreeNode *t_out_root){
+void _find_interpolation_points_linear(TreeNode *out_t_root, int f_param_num, const float (*f)(float, int, const float [2][f_param_num]), const float f_params[2][f_param_num], const struct _find_interpolation_points_extra_params *extra_params, const float t_tab[2], const float f_tab[2]){
     float t_test[3];
     float f_test_true[3];
     float f_test_interpolated[3];
@@ -99,8 +99,8 @@ void _find_interpolation_points_linear(int f_param_num, const float (*f)(float, 
         if (abs_error > extra_params->abs_err_max){
             float t_tab_new[] = {t_tab[0], t_test[0], t_test[1]};
             float f_tab_new[] = {f_tab[0], f_test_true[0], f_test_true[1]};
-            tree_add_node_left(t_out_root, t_tab_new[0]);
-            _find_interpolation_points_linear(f_param_num, f, f_params, extra_params, t_tab_new, f_tab_new, t_out_root->left);
+            tree_add_node_left(out_t_root, t_tab_new[0]);
+            _find_interpolation_points_linear(out_t_root->left, f_param_num, f, f_params, extra_params, t_tab_new, f_tab_new);
             
             t_tab_new[0] = t_test[1];
             t_tab_new[1] = t_test[2];
@@ -108,8 +108,8 @@ void _find_interpolation_points_linear(int f_param_num, const float (*f)(float, 
             f_tab_new[0] = f_test_true[1];
             f_tab_new[1] = f_test_true[2];
             f_tab_new[2] = f_tab[2];
-            tree_add_node_right(t_out_root, t_tab_new[0]);
-            _find_interpolation_points_linear(f_param_num, f, f_params, extra_params, t_tab_new, f_tab_new, t_out_root->right);
+            tree_add_node_right(out_t_root, t_tab_new[0]);
+            _find_interpolation_points_linear(out_t_root->right, f_param_num, f, f_params, extra_params, t_tab_new, f_tab_new);
             break;
         }
     }
@@ -130,7 +130,7 @@ float lerp_map(float t, const float (**t_x_map)[2], int map_size){
     return lerp(&lerp_s, t);
 }
 
-float lerp_map_ascending_optimized(float t, Lerp *lerp_s, int *idx_map_ptr, const float (**t_x_map)[2], int map_size){
+float lerp_map_ascending_optimized(float t, const float (**t_x_map)[2], int map_size, Lerp *lerp_s, int *idx_map_ptr){
     // increase map index until t is in range
     // also check if t is in map range
     int i = *idx_map_ptr;

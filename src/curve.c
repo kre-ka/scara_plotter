@@ -39,7 +39,7 @@ float dp_dt_fun(float t, int poly_deg, const float curve_diff_coef[2][poly_deg+1
     return sqrtf(powf(curve_diff_eval[0], 2) + powf(curve_diff_eval[1], 2));
 }
 
-void make_p_t_map_table(float (**out_p_t_dyn)[2], int *size_ptr, const CubicCurve *curve, float abs_err_max){
+void make_p_t_map_table(float (**out_p_t_dyn)[2], int *out_size_ptr, const CubicCurve *curve, float abs_err_max){
     // curve differential is needed for path length computations
     QuadraticCurve curve_diff;
     cubic_curve_diff(&curve_diff, curve);
@@ -73,7 +73,7 @@ void make_p_t_map_table(float (**out_p_t_dyn)[2], int *size_ptr, const CubicCurv
         (*out_p_t_dyn)[i][0] = p_tab[i];
         (*out_p_t_dyn)[i][1] = t_tab[i];
     }
-    *size_ptr = tab_size;
+    *out_size_ptr = tab_size;
 
     free(t_tab);
     free(p_tab);

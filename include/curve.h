@@ -38,6 +38,6 @@ Parameters:
 - curve - curve to follow
 - abs_err_max - maximum allowed absolute error [mm]
 */
-void make_p_t_map_table(float (**out_p_t_dyn)[2], int *size_ptr, const CubicCurve *curve, float abs_err_max);
+void make_p_t_map_table(float (**out_p_t_dyn)[2], int *out_size_ptr, const CubicCurve *curve, float abs_err_max);
 
 #endif /* INC_CURVE_H_ */

@@ -59,7 +59,7 @@ int main(){
         }
 
         // calculate manipulator joint angles
-        inverse_kinematics(&manipulator, xy, theta);
+        inverse_kinematics(theta, &manipulator, xy);
         printf("t0: %f\t t1: %f", theta[0], theta[1]);
 
         printf("\n");

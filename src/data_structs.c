@@ -27,11 +27,11 @@ void tree_free(TreeNode *root){
     free(root);
 }
 
-void tree_leaves_to_array(const TreeNode *root, float **out, int *idx_ptr){
+void tree_leaves_to_array(float **out, const TreeNode *root, int *idx_ptr){
     if (!root) return;
     if (root->left || root->right) {
-        tree_leaves_to_array(root->left, out, idx_ptr);
-        tree_leaves_to_array(root->right, out, idx_ptr);
+        tree_leaves_to_array(out, root->left, idx_ptr);
+        tree_leaves_to_array(out, root->right, idx_ptr);
     }
     else {
         (*out)[*idx_ptr] = root->data;
@@ -39,13 +39,13 @@ void tree_leaves_to_array(const TreeNode *root, float **out, int *idx_ptr){
     }
 }
 
-void tree_leaves_to_array_get_size(const TreeNode *root, int *size_ptr){
+void tree_leaves_to_array_get_size(int *out_size_ptr, const TreeNode *root){
     if (!root) return;
     if (root->left || root->right) {
-        tree_leaves_to_array_get_size(root->left, size_ptr);
-        tree_leaves_to_array_get_size(root->right, size_ptr);
+        tree_leaves_to_array_get_size(out_size_ptr, root->left);
+        tree_leaves_to_array_get_size(out_size_ptr, root->right);
     }
     else {
-        (*size_ptr)++;
+        (*out_size_ptr)++;
     }
 }
