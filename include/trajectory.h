@@ -27,15 +27,18 @@ trajectory_free when you're done using it.
 Params:
 - trajectory
 - path - path to follow
-- abs_err_max - absolute path following accuracy [mm]
+- err_max_speed - maximum allowed speed error for trajectory traversal -
+does not translate to speed units directly, but the lower the more accurate
+(with increasing cost in computation and memory consumption)
 - v_0 - intial speed [mm/s]
 - v_target - target speed [mm/s]
 - v_f_ptr - final speed [mm/s] (can be corrected inside function, hence
 pointer)
 - acc - acceleration and decceleration [mm/s^2]
 */
-bool trajectory_init(Trajectory* trajectory, CubicCurve path, float abs_err_max,
-                     float v_0, float v_target, float* v_f_ptr, float acc);
+bool trajectory_init(Trajectory* trajectory, CubicCurve path,
+                     float err_max_speed, float v_0, float v_target,
+                     float* v_f_ptr, float acc);
 
 /*
 Frees dynamic memory allocated by trajectory

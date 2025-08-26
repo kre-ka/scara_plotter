@@ -27,7 +27,7 @@ void quad_interp_init_acceleration(QuadInterp *interp, float acc, float t_0,
 float quad_interp(const QuadInterp *interp, float t);
 
 struct _find_interpolation_points_extra_params {
-  float abs_err_max;
+  float err_max_abs;
   float test_points[3];
 };
 
@@ -35,7 +35,7 @@ void find_interpolation_points_linear(
     float **out_t_dyn, int *out_t_size, int f_param_num,
     const float (*f)(float, int, const float[2][f_param_num]),
     const float f_params[2][f_param_num], const float t_span[2],
-    float abs_err_max);
+    float err_max_abs);
 
 void _find_interpolation_points_linear(
     TreeNode *t_out_root, int f_param_num,

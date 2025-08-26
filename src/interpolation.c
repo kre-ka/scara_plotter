@@ -50,9 +50,9 @@ void find_interpolation_points_linear(
     float **out_t_dyn, int *out_t_size, int f_param_num,
     const float (*f)(float, int, const float[2][f_param_num]),
     const float f_params[2][f_param_num], const float t_span[2],
-    float abs_err_max) {
+    float err_max_abs) {
   struct _find_interpolation_points_extra_params params;
-  params.abs_err_max = abs_err_max;
+  params.err_max_abs = err_max_abs;
 
   params.test_points[0] = 0.25;
   params.test_points[1] = 0.5;
@@ -106,7 +106,7 @@ void _find_interpolation_points_linear(
 
   for (int i = 0; i < 3; i++) {
     float abs_error = fabs(f_test_interpolated[i] - f_test_true[i]);
-    if (abs_error > extra_params->abs_err_max) {
+    if (abs_error > extra_params->err_max_abs) {
       float t_tab_new[] = {t_tab[0], t_test[0], t_test[1]};
       float f_tab_new[] = {f_tab[0], f_test_true[0], f_test_true[1]};
       tree_add_node_left(out_t_root, t_tab_new[0]);

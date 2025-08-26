@@ -10,12 +10,13 @@
 #include "interpolation.h"
 #include "polynomial.h"
 
-bool trajectory_init(Trajectory* trajectory, CubicCurve path, float abs_err_max,
-                     float v_0, float v_target, float* v_f_ptr, float acc) {
+bool trajectory_init(Trajectory* trajectory, CubicCurve path,
+                     float err_max_speed, float v_0, float v_target,
+                     float* v_f_ptr, float acc) {
   trajectory->path = path;
 
   make_p_t_map_table(&(trajectory->p_tau_map), &(trajectory->p_tau_map_size),
-                     &(trajectory->path), abs_err_max);
+                     &(trajectory->path), err_max_speed);
 
   // it's possible to not reach final speed when curve is short and
   // acceleration is low in this case final speed is corrected and should be
