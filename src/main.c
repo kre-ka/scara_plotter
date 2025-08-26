@@ -32,7 +32,7 @@ int main() {
   // create time-spatial trajectory from curve
   Trajectory trajectory;
   float v_n = 0.0;
-  trajectory_init(&trajectory, curve, 1e-2, 0.0, V_TARGET_DEFAULT, &v_n,
+  trajectory_init(&trajectory, curve, 1.0, 0.0, V_TARGET_DEFAULT, &v_n,
                   ACC_MAX_DEFAULT);
 
   // execute trajectory one point at the time
