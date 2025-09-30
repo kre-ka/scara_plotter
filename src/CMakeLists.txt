@@ -12,5 +12,6 @@ add_library(scara_plotter_lib
     polynomial.c
     trajectory.c
     )
+target_link_libraries(scara_plotter_lib m)
 
 target_link_libraries(scara_plotter scara_plotter_lib)
