@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "debug.h"
 #include "integration.h"
 #include "interpolation.h"
 #include "polynomial.h"
@@ -74,7 +75,7 @@ void make_p_t_map_table(float (**out_p_t_dyn)[2], int *out_size_ptr,
     p_tab[i] = p_tab[i - 1] + integrate_step_trapezoid(dp_dt, &t_tab[i - 1]);
   }
 
-  printf("path length: %f\n", p_tab[tab_size - 1]);
+  debug_print("path length: %f\n", p_tab[tab_size - 1]);
 
   *out_p_t_dyn = malloc(tab_size * 2 * sizeof(float));
   for (int i = 0; i < tab_size; i++) {

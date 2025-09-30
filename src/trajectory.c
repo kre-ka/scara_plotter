@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "curve.h"
+#include "debug.h"
 #include "integration.h"
 #include "interpolation.h"
 #include "polynomial.h"
@@ -26,8 +27,8 @@ bool trajectory_init(Trajectory* trajectory, CubicCurve path,
     success = false;
     printf("End speed cannot be reached.\n");
   }
-  printf("movement phases moments: %f, %f, %f\n\n", trajectory->t_phases[0],
-         trajectory->t_phases[1], trajectory->t_phases[2]);
+  debug_print("movement phases moments: %f, %f, %f\n", trajectory->t_phases[0],
+              trajectory->t_phases[1], trajectory->t_phases[2]);
 
   return success;
 }
